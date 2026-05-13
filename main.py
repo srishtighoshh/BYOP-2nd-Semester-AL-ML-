@@ -19,26 +19,11 @@ except ImportError:
 
 # SAFE NLTK DOWNLOADS
 def download_nltk():
+    nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('vader_lexicon', quiet=True)
 
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except:
-        nltk.download('punkt')
-
-    try:
-        nltk.data.find('tokenizers/punkt_tab')
-    except:
-        nltk.download('punkt_tab')
-
-    try:
-        nltk.data.find('corpora/stopwords')
-    except:
-        nltk.download('stopwords')
-
-    try:
-        nltk.data.find('sentiment/vader_lexicon')
-    except:
-        nltk.download('vader_lexicon')
 
 download_nltk()
 
