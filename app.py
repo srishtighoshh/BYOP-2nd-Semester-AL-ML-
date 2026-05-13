@@ -1,26 +1,27 @@
 import streamlit as st
-from summarizer import summarize_text
 import PyPDF2
 
-# Page Config
+from summarizer import analyze_text
+
+# PAGE CONFIG
 st.set_page_config(
     page_title="InsightNote",
     page_icon="📘",
     layout="centered"
 )
 
-# Title
+# TITLE
 st.title("📘 InsightNote")
 st.subheader("Smart Academic Text Analyzer")
 
 st.write(
     """
-    Upload academic content or paste notes to generate
-    concise AI-powered summaries using NLP.
+    Analyze academic text, lecture notes, articles,
+    and PDFs using NLP-powered summarization.
     """
 )
 
-# Input Type
+# INPUT TYPE
 input_option = st.radio(
     "Choose Input Type:",
     ["Text", "PDF"]
@@ -49,46 +50,95 @@ elif input_option == "PDF":
         pdf_reader = PyPDF2.PdfReader(uploaded_file)
 
         for page in pdf_reader.pages:
-            text += page.extract_text()
+
+            extracted = page.extract_text()
+
+            if extracted:
+                text += extracted
 
         st.success("✅ PDF uploaded successfully!")
 
-# Summary Length Slider
+# SUMMARY LENGTH
 summary_length = st.slider(
-    "Select Number of Sentences:",
+    "Select Number of Summary Sentences:",
     min_value=1,
     max_value=10,
-    value=3
+    value=4
 )
 
-# Word Count
+# WORD COUNT
 if text:
+
     word_count = len(text.split())
+
     st.write(f"📊 Word Count: {word_count}")
 
-# Generate Summary
-if st.button("Generate Summary"):
+# ANALYZE BUTTON
+if st.button("Generate Analysis"):
 
     if text.strip() == "":
+
         st.warning("⚠️ Please provide some text.")
 
     else:
 
-        with st.spinner("Generating summary..."):
+        with st.spinner("Analyzing text..."):
 
-            summary = summarize_text(
+            results = analyze_text(
                 text,
                 summary_length
             )
 
-        st.markdown("## 📌 Generated Summary")
+        # TITLE
+        st.markdown("## 🧠 Generated Title")
+        st.info(results["title"])
 
-        st.success(summary)
+        # SUMMARY
+        st.markdown("## 📌 Summary")
 
-# Footer
+        for sentence in results["summary"]:
+            st.write("•", sentence)
+
+        # KEYWORDS
+        st.markdown("## 🔑 Keywords")
+
+        st.write(", ".join(results["keywords"]))
+
+        # SENTIMENT
+        st.markdown("## 💬 Sentiment Analysis")
+
+        st.success(results["sentiment"])
+
+        # READING TIME
+        st.markdown("## ⏱️ Estimated Reading Time")
+
+        st.write(
+            f"{results['reading_time']} minutes"
+        )
+
+        # TEXT STATS
+        st.markdown("## 📊 Text Statistics")
+
+        stats = results["stats"]
+
+        st.write(f"Words: {stats['Words']}")
+        st.write(f"Sentences: {stats['Sentences']}")
+        st.write(f"Characters: {stats['Characters']}")
+
+        # DOWNLOAD BUTTON
+        summary_text = "\n".join(results["summary"])
+
+        st.download_button(
+            label="📥 Download Summary",
+            data=summary_text,
+            file_name="summary.txt",
+            mime="text/plain"
+        )
+
+# FOOTER
 st.markdown("---")
 
 st.caption(
     "Developed using Python, Streamlit, and NLP "
-    "as part of the BYOP AI/ML project."
+    "for the BYOP AI/ML Project."
 )
