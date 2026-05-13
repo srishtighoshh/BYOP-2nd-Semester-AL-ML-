@@ -1,57 +1,85 @@
 import streamlit as st
 from summarizer import summarize_text
+import PyPDF2
 
-# Page Configuration
+# Page Config
 st.set_page_config(
     page_title="InsightNote",
     page_icon="📘",
     layout="centered"
 )
 
-# Main Title
+# Title
 st.title("📘 InsightNote")
 st.subheader("Smart Academic Text Analyzer")
 
-# Description
 st.write(
     """
-    InsightNote is an AI-powered academic text analysis tool designed
-    to help students quickly summarize lecture notes, articles,
-    research content, and study material using Natural Language Processing (NLP).
+    Upload academic content or paste notes to generate
+    concise AI-powered summaries using NLP.
     """
 )
 
-# Feature Section
-st.markdown("### ✨ Features")
-st.markdown("""
-- 📚 Academic text summarization
-- ⚡ Fast AI-generated summaries
-- 🧠 NLP-based text processing
-- 📝 Helpful for revision and quick understanding
-""")
+# Input Type
+input_option = st.radio(
+    "Choose Input Type:",
+    ["Text", "PDF"]
+)
 
-# User Input
-user_input = st.text_area(
-    "📥 Paste your academic text below:",
-    height=300,
-    placeholder="Enter lecture notes, articles, or study material here..."
+text = ""
+
+# TEXT INPUT
+if input_option == "Text":
+
+    text = st.text_area(
+        "📥 Paste your academic text:",
+        height=300
+    )
+
+# PDF INPUT
+elif input_option == "PDF":
+
+    uploaded_file = st.file_uploader(
+        "Upload PDF File",
+        type=["pdf"]
+    )
+
+    if uploaded_file is not None:
+
+        pdf_reader = PyPDF2.PdfReader(uploaded_file)
+
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+
+        st.success("✅ PDF uploaded successfully!")
+
+# Summary Length Slider
+summary_length = st.slider(
+    "Select Number of Sentences:",
+    min_value=1,
+    max_value=10,
+    value=3
 )
 
 # Word Count
-if user_input:
-    word_count = len(user_input.split())
+if text:
+    word_count = len(text.split())
     st.write(f"📊 Word Count: {word_count}")
 
-# Summary Button
+# Generate Summary
 if st.button("Generate Summary"):
 
-    if user_input.strip() == "":
-        st.warning("⚠️ Please enter some text to summarize.")
+    if text.strip() == "":
+        st.warning("⚠️ Please provide some text.")
 
     else:
-        with st.spinner("Analyzing and generating summary..."):
 
-            summary = summarize_text(user_input)
+        with st.spinner("Generating summary..."):
+
+            summary = summarize_text(
+                text,
+                summary_length
+            )
 
         st.markdown("## 📌 Generated Summary")
 
@@ -59,7 +87,8 @@ if st.button("Generate Summary"):
 
 # Footer
 st.markdown("---")
+
 st.caption(
-    "Developed using Python, Streamlit, and NLP techniques "
+    "Developed using Python, Streamlit, and NLP "
     "as part of the BYOP AI/ML project."
 )
