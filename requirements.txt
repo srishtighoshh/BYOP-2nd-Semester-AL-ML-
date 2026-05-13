@@ -1,4 +1,4 @@
-nltk
-matplotlib
-PyPDF2
 streamlit
+nltk
+PyPDF2
+matplotlib
