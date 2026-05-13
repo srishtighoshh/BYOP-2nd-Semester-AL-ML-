@@ -1,74 +1,33 @@
-import nltk
-import heapq
-import re
+from main import (
+    summarize,
+    extract_keywords,
+    generate_title,
+    sentiment,
+    reading_time,
+    text_stats
+)
 
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
+def analyze_text(text, num_sentences):
 
-# Download NLTK resources
-nltk.download('punkt_tab')
-nltk.download('punkt')
-nltk.download('stopwords')
+    summary_data = summarize(text, num_sentences)
 
-def summarize_text(text, num_sentences=3):
+    summary = [s[0] for s in summary_data]
 
-    # Clean text
-    text = re.sub(r'\[[0-9]*\]', ' ', text)
-    text = re.sub(r'\s+', ' ', text)
+    keywords = extract_keywords(text)
 
-    formatted_text = re.sub('[^a-zA-Z]', ' ', text)
-    formatted_text = formatted_text.lower()
+    title = generate_title(text, keywords)
 
-    # Stopwords
-    stop_words = set(stopwords.words("english"))
+    senti = sentiment(text)
 
-    words = word_tokenize(formatted_text)
+    read_time = reading_time(text)
 
-    # Word frequencies
-    word_frequencies = {}
+    stats = text_stats(text)
 
-    for word in words:
-        if word not in stop_words:
-
-            if word not in word_frequencies:
-                word_frequencies[word] = 1
-            else:
-                word_frequencies[word] += 1
-
-    # Normalize
-    maximum_frequency = max(word_frequencies.values())
-
-    for word in word_frequencies.keys():
-        word_frequencies[word] = (
-            word_frequencies[word] / maximum_frequency
-        )
-
-    # Sentence tokenization
-    sentence_list = sent_tokenize(text)
-
-    sentence_scores = {}
-
-    for sentence in sentence_list:
-
-        for word in word_tokenize(sentence.lower()):
-
-            if word in word_frequencies:
-
-                if len(sentence.split(' ')) < 40:
-
-                    if sentence not in sentence_scores:
-                        sentence_scores[sentence] = word_frequencies[word]
-
-                    else:
-                        sentence_scores[sentence] += word_frequencies[word]
-
-    # Select top sentences
-    summary_sentences = heapq.nlargest(
-        num_sentences,
-        sentence_scores,
-        key=sentence_scores.get
-    )
-
-    summary = ' '.join(summary_sentences)
-
-    return summary
+    return {
+        "title": title,
+        "summary": summary,
+        "keywords": keywords,
+        "sentiment": senti,
+        "reading_time": read_time,
+        "stats": stats
+    }
