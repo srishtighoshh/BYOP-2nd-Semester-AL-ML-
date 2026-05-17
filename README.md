@@ -6,7 +6,11 @@ InsightNote is a Python-based Natural Language Processing (NLP) tool designed to
 
 This project is especially useful during exam preparation when going through lengthy notes becomes time-consuming.
 
-https://9misngvycs8jceyerjchfh.streamlit.app/
+
+## Live Application
+
+[Click Here to Open InsightNote](https://9misngvycs8jceyerjchfh.streamlit.app/)
+
 
 ## 🎯 What This Project Does
 InsightNote takes a large text input (manual text or PDF) and provides:
